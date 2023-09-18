@@ -1,0 +1,19 @@
+{
+    "name": "yusuftogtay/php_basic_mvc",
+    "description": "MVC application architecture example with PHP",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "Core\\": "Core/",
+            "App\\": "App/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Ahmet Yusuf TOĞTAY",
+            "email": "yusuf.togtay@gmail.com"
+        }
+    ],
+    "minimum-stability": "alpha",
+    "require": {}
+}

@@ -1,0 +1,51 @@
+Herangi bir framework veya hazır paket kullanmadan basit bir MVC yapısı sağlamanızı rica ediyoruz ediyoruz. İstenilen gerekli işlemler tamamen sizin tarafınızdan yazılmalıdır. Routing yapısı gelen path'i eşleştirdiğinde Controller'ı yüklemeli ve ilgili action'u çalıştırmalıdır.
+h
+Fonksiyonların kullanım şekilleri önemli değildir. Laravel'de kullanılan syntax'ı kullanabilirsiniz.
+
+
+---- Routing ----
+Route'da istenilen temel koşullar şunlardır:
+- Route URI'da parametre desteği sağlanmalıdır. Örneğin: /user/{id}, /blog/{id}/translations/{language_id}
+- Route URI'da parametrelerde optional desteği sağlanmalıdır. Örneğin: /user/{id?}
+- Route URI'da pattern(regex) desteği sağlanmalıdır. Örneğin: /user/{\d+}
+
+İstekte bulunan URL tanımlanan herhangi bir route ile eşleştiğinde controller çalıştırılacaktır.
+- Örneğin kullanıcı http://127.0.0.1/user/5 URL'sine girdiğinde "/user/{id}" URI'si ile eşleşecek ve UserController'da show metodunu çalıştıracak ve URL'de yer alan 5 verisi show metodunun bir argümanı olarak iletilecektir.
+
+Not: UserController ve show metodu örnek olarak verilmiştir. Hangi controllerin ve controllerin hangi metodunun çalıştırılacağı kullanıcı route tanımlarken belirtecektir.
+
+
+---- Middleware ----
+Controller çalıştırılmadan önce middleware katmanı sağlamanızı bekliyoruz. Middleware katmanında before & after yapısını sağlamanızı beklemiyoruz. Sadece middleware'in controller çalıştırılmadan önce çalıştırılması, ardından controllerin çalıştırılması yeterlidir. Hangi URI için hangi middleware'in çalıştırılacağının belirlenmesi konusunda bir kısıt koymuyoruz. X URI'si için şu Y URI'si için şu middleware çalıştır diyebildiğimiz herhangi bir array, fonksiyon, URI options vb. olabilir.
+
+
+---- Controller & View ----
+Controller içerisinde ilgili metod çalıştırıldığında bir content dönüşü beklenecektir. Burada kendi template engine'ninizi oluşturmanızı beklemekteyiz. Template engine'de beklenen tek şey view path'ini verdiğinizde ilgili dosyayı yüklemesi ve değişken gönderilmesi istendiyse bu değişkenin template dosyasına iletilmesi. 
+
+Örnek kullanım olarak:
+return $this->view('template-path.php', [
+    'user_id' => $id
+]);
+
+vb. gibi. 
+
+Not: View dosyalarının uzantılarının ne olup olmayacağı konusunda herhangi bir kısıtlama sağlamıyoruz. Dosya uzantısı istediğiniz şekilde bitebilir. Template engine'nin ek olarak directive(if,for,foreach vb.) desteğine sahip olmasını vs. de beklemiyoruz. Sadece ilgili path'deki view yüklenip verilen değişkenler view içerisinde kullanılması yeterlidir.
+
+---- Response Multi Type Content ----
+Controller'ın content çıktısında array & object gibi veri türlerininde return edilebilmesine olanak sağlamanası talep edilmekte. 
+
+Örnek olarak view dosyasının yüklenmesi ve view'den gelen content'in gösterilmesi için şunu kullanırken 
+return $this->view('template-path.php', [
+    'user_id' => $id
+]);
+
+Çıktının tarayıcı tarafına JSON olarak iletilmesini istiyorsan şu şekilde bir kullanıma destek vermeli
+return [
+    'username' => 'Berkay'
+];
+
+Controller'in ilgili metodu(actionu) array & object return ediyorsa Content-Type "JSON" olarak ayarlanıp content JSON tipinde döndürülecektir. Action string döndürüyorsa Content-Type default olarak "text" şeklinde sunuculacak ve content ekrana basılacaktır.
+
+---- Model ----
+Projede model yapısı talep edilmemektedir. Arayüz olarak PDO'nun yer aldığı statik bir method projede sunulması yeterlidir.
+Örnek olarak projenin herhangi bir yerinde DB::query('SELECT ...') şeklinde DB sınıfına erişebilip PDO Instance'ine ulaşabilmemiz yeterlidir;
